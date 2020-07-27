@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Patch, Logger, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Req, Patch, Logger, Body, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { TasksService } from '../app/services/tasks.service';
 import { Task , TaskStatus } from '../domain/models/task.interface';
 import { CreateTaskDto } from '../domain/dto/create-task-dto';
@@ -12,21 +12,24 @@ export class TasksController {
     constructor(private taskService: TasksService){}
 
     @Get()
-    getAllTaks(@Req() req):Task[]{
+    getAllTaks(@Req() req):Promise<Task[]>{
         let data  = this.taskService.getAllTasks();
-        Logger.log(data);
-        return data;
+         return data;
     }
 
     @Get('/:id')
-    getTaskById(@Param('id') id: string):Task{
-        return this.taskService.getTaskById(id);
+    getTaskById(@Param('id') id: string):Promise<Task>{
+        try{
+            return this.taskService.getTaskById(id);
+        }catch(Exception){
+            throw new HttpException("Exception",HttpStatus.CONFLICT);
+        }
     }
 
     @ApiOperation({ summary: 'Create Task'})
     @Post()
     createTask(
-        @Body() createTaskDto: CreateTaskDto):Promise<Task> {
+        @Body() createTaskDto: CreateTaskDto) {
         let data = this.taskService.createTask(createTaskDto);
         Logger.log(data);
         return data;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { Task, TaskStatus } from '../../domain/models/task.interface';
 import { v1 as uuid} from 'uuid';
 import { CreateTaskDto } from '../../domain/dto/create-task-dto';
@@ -12,30 +12,40 @@ export class TasksService {
 
     constructor(@InjectModel("Task") private taskModel: Model<Task>){}
 
-    getAllTasks():Task[]
+    async getAllTasks():Promise<Task[]>
     {
-        return this.tasks;
+        return await  this.taskModel.find({});
     }
 
-    async createTask(createTaskDto:CreateTaskDto): Promise<Task>{
+    async createTask(createTaskDto:CreateTaskDto){
         
         const createdTask =  new this.taskModel(createTaskDto);
-        return createdTask.save();
-
-      
+        const session = await createdTask.db.startSession();
+        
+        try{
+            session.startTransaction();
+            let result = await this.taskModel.create([{"title":createTaskDto.title,"description":createTaskDto.description,"status":""}],{session: session})    
+            await session.commitTransaction();
+        }catch (error){
+            Logger.error(error);
+            await session.abortTransaction();
+        }finally{
+            session.endSession();
+        }
     }
 
-    getTaskById(id: string):Task{
-        //return this.tasks.find(task=>task.id === id);
-        return null;
+    async getTaskById(id: string):Promise<Task>{
+         let result =  await this.taskModel.findById(id);
+         if(!result) throw new NotFoundException();
+         return result;
     }
 
     updateTaskStatus(id: string, status: TaskStatus):Task{
 
 
-        const task = this.getTaskById(id);
-        task.status= status;
-        return task;
+//        const task = this.getTaskById(id);
+  //      task.status= status;
+        return null;
 
     }
 
