@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 @Injectable()
 export class TasksService {
 
-    private tasks: Task[]=[];
+
 
     constructor(@InjectModel("Task") private taskModel: Model<Task>){}
 
