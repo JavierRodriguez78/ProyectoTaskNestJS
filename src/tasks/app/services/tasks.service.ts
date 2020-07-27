@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, BadGatewayException } from '@nestjs/common';
 import { Task, TaskStatus } from '../../domain/models/task.interface';
 import { v1 as uuid} from 'uuid';
 import { CreateTaskDto } from '../../domain/dto/create-task-dto';
@@ -14,6 +14,7 @@ export class TasksService {
 
     async getAllTasks():Promise<Task[]>
     {
+       
         return await  this.taskModel.find({});
     }
 
@@ -29,6 +30,7 @@ export class TasksService {
         }catch (error){
             Logger.error(error);
             await session.abortTransaction();
+            throw new BadGatewayException();
         }finally{
             session.endSession();
         }
@@ -40,18 +42,30 @@ export class TasksService {
          return result;
     }
 
-    updateTaskStatus(id: string, status: TaskStatus):Task{
+    async updateTaskStatus(id: string, status: TaskStatus):Promise<Task>{
 
-
-//        const task = this.getTaskById(id);
-  //      task.status= status;
-        return null;
-
+        let task = await this.getTaskById(id);
+        const session = await task.db.startSession();
+        try{
+            session.startTransaction()
+            let result = await task.updateOne({"status":status},{"session":session});
+            await session.commitTransaction();
+            return result;
+        }catch(error){
+            session.abortTransaction();
+            throw new BadGatewayException();
+        }finally{
+            session.endSession();
+        }
     }
 
-    deleteTask(id: string)
+    async deleteTask(id: string):Promise<Task>
     {
-       // this.tasks = this.tasks.filter( task=>task.id!==id);
+      
+        let result = await this.taskModel.findByIdAndDelete(id);
+        if(!result) throw new NotFoundException();
+        return result;
+      
     }
 
 

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Req, Patch, Logger, Body, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Patch, Logger, Body, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { TasksService } from '../app/services/tasks.service';
 import { Task , TaskStatus } from '../domain/models/task.interface';
 import { CreateTaskDto } from '../domain/dto/create-task-dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-
+import { v1 as uuid} from 'uuid';
 
 @ApiTags('Tasks')
 @Controller('/tasks')
@@ -12,9 +13,16 @@ export class TasksController {
     constructor(private taskService: TasksService){}
 
     @Get()
-    getAllTaks(@Req() req):Promise<Task[]>{
-        let data  = this.taskService.getAllTasks();
-         return data;
+    async getAllTaks(@Req() req, @Res() res: Response){
+        let data  = await this.taskService.getAllTasks();
+
+         res.status(HttpStatus.ACCEPTED).json({
+             "type:":"Tasks",
+             "id:": uuid(),
+             "attributes": data,
+         });
+         
+        
     }
 
     @Get('/:id')
@@ -30,9 +38,13 @@ export class TasksController {
     @Post()
     createTask(
         @Body() createTaskDto: CreateTaskDto) {
-        let data = this.taskService.createTask(createTaskDto);
-        Logger.log(data);
+            try{
+                let data = this.taskService.createTask(createTaskDto);
+                Logger.log(data);
         return data;
+            }catch(Exception){
+                throw new HttpException("Exception", HttpStatus.CONFLICT);
+            }
     }
 
 
@@ -41,13 +53,17 @@ export class TasksController {
         @Param('id') id: string,
         @Body('status') status: TaskStatus,
 
-    ):Task{
+    ){
         return this.taskService.updateTaskStatus(id, status);
     }
 
     @Delete('/:id')
     deleteTask(@Param('id') id:string){
+        try{
         this.taskService.deleteTask(id);
+        }catch(Ex){
+            throw new HttpException("Exception", HttpStatus.CONFLICT);
+        }
     }
 
    
