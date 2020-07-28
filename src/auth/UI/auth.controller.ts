@@ -9,13 +9,9 @@ export class AuthController {
 
     @Post()
     async login(@Body() loginUserDto:LoginUserDto){
-        try{
         let result = await this.authService.login(loginUserDto);
-        Logger.log(result);
-         return result;
-    }catch(Exception){
-            throw new HttpException("Exception", HttpStatus.CONFLICT);
-        }
-    }
 
+        Logger.log("Resultado ->"+ result);
+         return result;
+    }
 }
