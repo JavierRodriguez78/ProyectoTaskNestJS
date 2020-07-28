@@ -35,6 +35,13 @@ export class UserService {
        }
     }
 
+    async findByEmail(email):Promise<User>{
+       return await this.userModel.findOne({email:email});
+    }
+
+    async getAllUsers(){
+       return await this.userModel.find();
+    }
 
 
 }

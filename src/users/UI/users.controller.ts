@@ -1,4 +1,4 @@
-import { Controller, Post, HttpException, HttpStatus, Logger, Body } from '@nestjs/common';
+import { Controller, Post, HttpException, HttpStatus, Logger, Body, Get } from '@nestjs/common';
 import { RegisterUserDto } from '../domain/dto/regiser-user-dto';
 import { UserService } from '../app/services/userService';
 
@@ -18,6 +18,18 @@ export class UsersController {
             }catch(Exception){
                 throw new HttpException("Exception", HttpStatus.CONFLICT);
             }
+    }
+
+
+    @Get()
+    getAllUsers(){
+        try{
+          return   this.userService.getAllUsers();
+        }
+        catch(Exception){
+            throw new HttpException("Exception", HttpStatus.CONFLICT);
+        }
+        
     }
 
 }

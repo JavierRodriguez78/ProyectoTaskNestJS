@@ -10,6 +10,7 @@ import { userSchema } from './infraestructure/MongoDB/user.schema';
   imports:[
     MongooseModule.forFeature([{name:'User', schema: userSchema}]),
   ],
+  exports: [UserService],
   controllers: [UsersController],
   providers: [UserService]
 })
