@@ -1,6 +1,9 @@
-import { Controller, Post, HttpException, HttpStatus, Logger, Body, Get } from '@nestjs/common';
+import { Controller, Post, HttpException, HttpStatus, Logger, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { RegisterUserDto } from '../domain/dto/regiser-user-dto';
 import { UserService } from '../app/services/userService';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+
 
 
 @Controller('users')
@@ -29,6 +32,14 @@ export class UsersController {
         catch(Exception){
             throw new HttpException("Exception", HttpStatus.CONFLICT);
         }
+        
+    }
+
+    @Get('/guard')
+    @UseGuards(AuthGuard())
+    getGuarUser(@Req() req: Request){
+        Logger.log(JSON.stringify(req['user']));
+        return "Entra";
         
     }
 
