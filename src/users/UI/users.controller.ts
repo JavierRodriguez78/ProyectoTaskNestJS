@@ -3,15 +3,24 @@ import { RegisterUserDto } from '../domain/dto/regiser-user-dto';
 import { UserService } from '../app/services/userService';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { ApiTags, ApiResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { User } from '../domain/models/user.interface';
+import { userSchema } from '../infraestructure/MongoDB/user.schema';
 
 
-
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
 
     constructor(private userService: UserService){}
 
     @Post()
+    @ApiResponse({ status: 201, description: 'El usuario se ha creado'})
+    @ApiResponse({ status: 409, description:"El usuario ya existe"})
+    @ApiCreatedResponse({
+        description:"Usuario creado",
+        type: "userSchema",
+    })
     registerUser(
         @Body() registerUserDto: RegisterUserDto) {
             try{
@@ -25,6 +34,7 @@ export class UsersController {
 
 
     @Get()
+    @UseGuards(AuthGuard())
     getAllUsers(){
         try{
           return   this.userService.getAllUsers();

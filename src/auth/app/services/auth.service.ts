@@ -38,7 +38,7 @@ export class AuthService {
  async validateUserByJwt(payload: JwtPayLoad){
      Logger.log("Entra en validateUserByJWT");
     let user = await this.userService.findByEmail(payload.email);
-    if(user) return user;
+    if(user) return user ;
      throw new UnauthorizedException();
  }
 

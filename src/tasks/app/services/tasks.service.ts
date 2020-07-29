@@ -18,11 +18,11 @@ export class TasksService {
         return await  this.taskModel.find({});
     }
 
-    async createTask(createTaskDto:CreateTaskDto){
+    async createTask(createTaskDto:CreateTaskDto, id:String){
         
         const createdTask =  new this.taskModel(createTaskDto);
         const session = await createdTask.db.startSession();
-        
+      
         try{
             session.startTransaction();
             let result = await this.taskModel.create([{"title":createTaskDto.title,"description":createTaskDto.description,"status":""}],{session: session})    

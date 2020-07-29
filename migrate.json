@@ -1,0 +1,4 @@
+{
+    "dbConnectionUri": "mongodb+srv://xavi:xavi78@cluster0.dtzfi.mongodb.net/Prueba?retryWrites=true&w=majority",
+    "migrationsDir": "db/migrations"
+  }
