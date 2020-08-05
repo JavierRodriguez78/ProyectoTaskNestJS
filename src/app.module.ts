@@ -6,9 +6,13 @@ import {MongooseModule} from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtStrategy } from './auth/app/strategies/jwt.strategy';
 
 @Module({
   imports: [
+
   ConfigModule.forRoot(),
   TasksModule,
   MongooseModule.forRoot(`mongodb+srv://${process.env.USER}:${process.env.PASS}@${process.env.HOST}?retryWrites=true&w=majority`),

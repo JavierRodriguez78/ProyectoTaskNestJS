@@ -1,3 +1,5 @@
 export interface JwtPayLoad {
-    email:string
+    email:string,
+    iss:string,
+    id:string
 }
